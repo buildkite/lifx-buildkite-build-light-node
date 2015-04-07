@@ -1,0 +1,27 @@
+{
+  "name": "LIFX Buildkite Build Light",
+  "description": "An example Node.js Buildkite webhook endpoint for creating a LIFX-powered build light",
+  "keywords": [
+    "ci",
+    "lifx",
+    "buildkite",
+    "nodejs",
+    "webhooks"
+  ],
+  "website": "https://buildkite.com/",
+  "repository": "https://github.com/buildkite/lifx-buildkite-build-light-node",
+  "logo": "https://dl.dropboxusercontent.com/u/376613/buildkite/buildkite-lifx-build-light-logo.svg",
+  "env": {
+    "BULB_SELECTOR": {
+      "description": "A LIFX API build selector to choose which bulbs to turn on (see http://api.lifx.com/ for examples)",
+      "value": "all"
+    },
+    "LIFX_ACCESS_TOKEN": {
+      "description": "A LIFX personal access token (create one at http://cloud.lifx.com/)"
+    },
+    "WEBHOOK_TOKEN": {
+      "description": "The Buildkite webhook token. Let Heroku generate this for you, copy it from the Heroku app’s config variables, and then paste it into Buildkite when you setup the webhook.",
+      "generator": "secret"
+    }
+  }
+}
