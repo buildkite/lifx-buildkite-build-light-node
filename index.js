@@ -1,11 +1,9 @@
 // Expected env settings
 var lifx_access_token = process.env.LIFX_ACCESS_TOKEN;
-if (!lifx_access_token) throw new Error("no LIFX_ACCESS_TOKEN set");
 var bulb_selector     = process.env.BULB_SELECTOR;
-if (!lifx_access_token) throw new Error("no BULB_SELECTOR set");
 var webhook_token     = process.env.WEBHOOK_TOKEN;
-if (!lifx_access_token) throw new Error("no WEBHOOK_TOKEN set");
 
+var https      = require('https');
 var express    = require('express');
 var bodyParser = require('body-parser');
 
@@ -23,7 +21,44 @@ app.post('/', function(req, res){
 
   // Process build event
   if (req.headers['x-buildkite-event'] == 'build') {
-    console.log('Processing build event');
+
+    switch (req.body.build.state) {
+      case 'running':
+        console.log('Build running');
+        post_to_lifx("/v1beta1/lights/" + bulb_selector + "/effects/breathe.json", {
+          power_on:   false,
+          color:      "yellow brightness:5%",
+          from_color: "yellow brightness:35%",
+          period:     5,
+          cycles:     9999,
+          persist:    true
+        });
+        break;
+      case "passed":
+        console.log("Build passed");
+        post_to_lifx("/v1beta1/lights/" + bulb_selector + "/effects/breathe.json", {
+          power_on:   false,
+          color:      "green brightness:75%",
+          from_color: "green brightness:10%",
+          period:     0.45,
+          cycles:     3,
+          persist:    true,
+          peak:       0.2
+        });
+        break;
+      case "failed":
+        console.log("Build failed");
+        post_to_lifx("/v1beta1/lights/" + bulb_selector + "/effects/breathe.json", {
+          power_on:   false,
+          color:      "red brightness:60%",
+          from_color: "red brightness:25%",
+          period:     0.1,
+          cycles:     20,
+          persist:    true,
+          peak:       0.2
+        });
+        break;
+    }
   }
 
   res.send('AOK');
@@ -36,3 +71,29 @@ app.get('/', function(req, res){
 app.listen(process.env.PORT || 3000, function() {
   console.log('Express listening on port', this.address().port);
 });
+
+function post_to_lifx(path, params) {
+  var body = JSON.stringify(params);
+
+  console.log("Posting to LIFX", path, body);
+
+  var req = https.request({
+    hostname: 'api.lifx.com',
+    port: 443,
+    path: path,
+    method: 'POST',
+    headers: {
+      "Content-type":   "application/json",
+      "Connection":     "close",
+      "Content-length": body.length,
+      "Authorization":  "Bearer " + lifx_access_token,
+    }
+  }, function(res) {
+    res.on("data", function(data) {
+      console.log("LIFX API response", res.statusCode, data.toString());
+    });
+  });
+
+  req.write(body);
+  req.end();
+}
