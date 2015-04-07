@@ -16,6 +16,7 @@ app.post('/', function(req, res){
 
   // Verify token
   if (req.headers['x-buildkite-token'] != webhook_token) {
+    console.log("Invalid webhook token");
     return res.status(401).send('Invalid token');
   }
 
