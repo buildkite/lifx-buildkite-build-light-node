@@ -35,9 +35,7 @@ app.post('/', function(req, res){
   }
 
   if (buildkiteEvent == 'build.finished') {
-    var buildState = req.body.build.state;
-
-    if (buildState == "passed") {
+    if (req.body.build.state == 'passed') {
       console.log("Build passed");
       post_to_lifx("/v1beta1/lights/" + bulb_selector + "/effects/breathe.json", {
         power_on:   false,
