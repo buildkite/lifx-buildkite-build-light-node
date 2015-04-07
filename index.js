@@ -22,7 +22,6 @@ app.post('/', function(req, res){
 
   var buildkiteEvent = req.headers['x-buildkite-event'];
 
-  // Process build.running event
   if (buildkiteEvent == 'build.running') {
     console.log('Build running');
     post_to_lifx("/v1beta1/lights/" + bulb_selector + "/effects/breathe.json", {
@@ -33,9 +32,9 @@ app.post('/', function(req, res){
       cycles:     9999,
       persist:    true
     });
+  }
 
-  // Process build.finished event
-  } else if (buildkiteEvent == 'build.finished') {
+  if (buildkiteEvent == 'build.finished') {
     var buildState = req.body.build.state;
 
     if (buildState == "passed") {
