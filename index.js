@@ -37,7 +37,7 @@ app.post('/', function(req, res){
   if (buildkiteEvent == 'build.finished') {
     if (req.body.build.state == 'passed') {
       console.log("Build passed");
-      post_to_lifx("/v1beta1/lights/" + bulb_selector + "/effects/breathe.json", {
+      post_to_lifx("/v1/lights/" + bulb_selector + "/effects/breathe.json", {
         power_on:   false,
         color:      "green brightness:75%",
         from_color: "green brightness:10%",
@@ -48,7 +48,7 @@ app.post('/', function(req, res){
       });
     } else {
       console.log("Build failed");
-      post_to_lifx("/v1beta1/lights/" + bulb_selector + "/effects/breathe.json", {
+      post_to_lifx("/v1/lights/" + bulb_selector + "/effects/breathe.json", {
         power_on:   false,
         color:      "red brightness:60%",
         from_color: "red brightness:25%",
